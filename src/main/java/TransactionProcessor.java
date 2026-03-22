@@ -4,6 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -31,6 +32,15 @@ public class TransactionProcessor {
                     .toList();
             System.out.println("Sucesso! Total de transações mapeadas: " + transacoes.size());
 
+            BigDecimal totalMovimento = transacoes.stream()
+                    .map(t -> {
+                        if ("Debit".equalsIgnoreCase(t.type())) {
+                            return t.amount().negate();
+                        }
+                        return t.amount();
+                    })
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            System.out.println("Valor total movimentado: R$ " + totalMovimento);
 
         } catch (IOException e) {
             System.err.println("Erro ao tentar processar o arquvo: " + e.getMessage());
