@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class TransactionProcessor {
@@ -26,8 +28,7 @@ public class TransactionProcessor {
                             col[9],
                             col[11],
                             Integer.parseInt(col[13]),
-                            new BigDecimal(col[14])
-                    ))
+                            new BigDecimal(col[14])))
                     .limit(10)
                     .toList();
             System.out.println("Sucesso! Total de transações mapeadas: " + transacoes.size());
@@ -50,6 +51,17 @@ public class TransactionProcessor {
             top10Transacoes.forEach(t ->
                     System.out.printf("ID: %s | Valor: R$ %.2f | Data: %s%n",
                             t.transactionId(), t.amount(), t.timestamp()));
+
+            Map<String, Double> mediaPorProfissao = transacoes.stream()
+                    .collect(Collectors.groupingBy(
+                            Transaction::occupation,
+                            Collectors.averagingDouble(t -> t.balance().doubleValue())
+                    ));
+            System.out.println("\n --- SALDO MÉDIO POR PROFISSÃO ---");
+            mediaPorProfissao.forEach((profissao, media) ->
+                    System.out.printf("%s: R$ %.2f%n ", profissao, media)
+            );
+
 
 
         } catch (IOException e) {
