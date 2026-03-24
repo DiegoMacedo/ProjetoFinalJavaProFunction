@@ -62,6 +62,14 @@ public class TransactionProcessor {
                     System.out.printf("%s: R$ %.2f%n ", profissao, media)
             );
 
+            Map<String, Long> totalDeTransacoesPorCanal = transacoes.stream()
+                    .collect(Collectors.groupingBy(
+                            Transaction::channel,
+                            Collectors.counting()
+                    ));
+            System.out.println("\n --- TOTAL DE TRANSAÇÕES POR CANAL");
+            totalDeTransacoesPorCanal.forEach((canal, total) ->
+                    System.out.printf("%s: %d ", canal, total));
 
 
         } catch (IOException e) {
