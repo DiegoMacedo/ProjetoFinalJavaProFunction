@@ -3,6 +3,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -70,6 +71,13 @@ public class TransactionProcessor {
             System.out.println("\n --- TOTAL DE TRANSAÇÕES POR CANAL");
             totalDeTransacoesPorCanal.forEach((canal, total) ->
                     System.out.printf("%s: %d ", canal, total));
+
+            LocalTime horaLimite = LocalTime.of(18,0);
+
+            List<Transaction> transacoesSuspeitas = transacoes.stream()
+                    .filter(t -> t.loginAttempts() > 3 || !t.timestamp().toLocalTime().isBefore(horaLimite))
+                    .toList();
+            System.out.println("\nSuspeitas: " + transacoesSuspeitas);
 
 
         } catch (IOException e) {
