@@ -42,6 +42,16 @@ public class TransactionProcessor {
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             System.out.println("Valor total movimentado: R$ " + totalMovimento);
 
+            List<Transaction> top10Transacoes = transacoes.stream()
+                    .sorted(Comparator.comparing(Transaction::amount).reversed())
+                    .limit(10)
+                    .toList();
+            System.out.println("\n--- TOP 10 MAIORES TRANSAÇÕES ---");
+            top10Transacoes.forEach(t ->
+                    System.out.printf("ID: %s | Valor: R$ %.2f | Data: %s%n",
+                            t.transactionId(), t.amount(), t.timestamp()));
+
+
         } catch (IOException e) {
             System.err.println("Erro ao tentar processar o arquvo: " + e.getMessage());
         }
