@@ -1,25 +1,28 @@
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.CompletableFuture;
 
 public class TransactionProcessor {
     static void main(String[] args) {
-        List<Transaction> todas = TransactionReader.lerArquivo("bank_transactions_data_2.csv");
+        System.out.println("Iniciando o processamento assíncrono...");
+        CompletableFuture<List<Transaction>> tarefaLeitura = CompletableFuture.supplyAsync(() ->
+                TransactionReader.lerArquivo("bank_transactions_data_2.csv")
+        );
 
-        System.out.println("Total movimentado "+ TransctionStatistics.calcularValorLiquido(todas));
+        CompletableFuture<Void> processamentoCompleto = tarefaLeitura.thenCompose(todas -> {
 
-        List<Transaction> transacoesSuspeitas = FraudDetector.buscarSuspeitas(todas);
+            CompletableFuture<Void> estatisticass = CompletableFuture.runAsync(() -> {
+                var total = TransctionStatistics.calcularValorLiquido(todas);
+                System.out.println("Cálculo de Saldo Líquido Conclído: " + total);
+            });
 
-        ReportWriter.exportarSuspeitas(transacoesSuspeitas, "trasacoes_suspeitas.csv");
+            CompletableFuture<Void> fraudes = CompletableFuture.runAsync(() -> {
+                var suspeitas = FraudDetector.buscarSuspeitas(todas);
+                ReportWriter.exportarSuspeitas(suspeitas, "transacoes_suspeitas.csv");
+            });
+            return CompletableFuture.allOf(estatisticass, fraudes);
+        });
+        processamentoCompleto.join();
+        System.out.println("Todos os relatórios foram gerados com sucesso!");
+
     }
 }
-
