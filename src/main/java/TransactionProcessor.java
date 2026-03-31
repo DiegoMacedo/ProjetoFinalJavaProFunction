@@ -1,29 +1,43 @@
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class TransactionProcessor {
-    static void main(String[] args) {
+    public static void main(String[] args) {
         System.out.println("Iniciando o processamento assíncrono...");
-        CompletableFuture<List<Transaction>> tarefaLeitura = CompletableFuture.supplyAsync(() ->
-                TransactionReader.lerArquivo("bank_transactions_data_2.csv")
-        );
+        try {
+            CompletableFuture.supplyAsync(() -> TransactionReader.lerArquivo("bank_transactions_data_2.csv"))
+                    .thenAccept(todas -> {
 
-        CompletableFuture<Void> processamentoCompleto = tarefaLeitura.thenCompose(todas -> {
+                        var tarefaGeraRelatorio = CompletableFuture.runAsync(() -> {
+                            var mediaSaldoPorProfissao = TransactionStatistics.mediaSaldoPorProfissao(todas);
+                            var volumePorCanalDeAtendimento = TransactionStatistics.volumePorCanal(todas);
+                            ReportWriter.gerarRelatorioEstatistico(mediaSaldoPorProfissao, volumePorCanalDeAtendimento, "relatorio_estatistico.txt");
+                        });
 
-            CompletableFuture<Void> estatisticass = CompletableFuture.runAsync(() -> {
-                var mediasDeSaldoPorPorfissao = TransctionStatistics.mediaSaldoPorProfissao(todas);
-                var volumesPorCanalDeAtendimento = TransctionStatistics.
-                System.out.println("Cálculo de Saldo Líquido Conclído: " + total);
-            });
+                        var tarefaGeraArquivoFralde = CompletableFuture.runAsync(() -> {
+                            var transacoesSuspeitas = FraudDetector.buscarSuspeitas(todas);
+                            ReportWriter.exportarSuspeitas(transacoesSuspeitas, "transacoes_suspeitas.csv");
+                        });
 
-            CompletableFuture<Void> fraudes = CompletableFuture.runAsync(() -> {
-                var suspeitas = FraudDetector.buscarSuspeitas(todas);
-                ReportWriter.exportarSuspeitas(suspeitas, "transacoes_suspeitas.csv");
-            });
-            return CompletableFuture.allOf(estatisticass, fraudes);
-        });
-        processamentoCompleto.join();
-        System.out.println("Todos os relatórios foram gerados com sucesso!");
+                        System.out.println("\n==================================================");
+                        System.out.println("   RELATÓRIO DE TRANSAÇÕES BANCÁRIAS - SUMÁRIO");
+                        System.out.println("==================================================");
+                        System.out.printf("Total de transações processadas: %, d%n", todas.size());
+                        System.out.printf("Valor total movimentado: R$ %,.2f%n", TransactionStatistics.calcularValorLiquido(todas));
 
+                        System.out.println("--------------------------------------------------");
+                        System.out.println("TOP 10 MAIORES TRANSAÇÕES:");
+                        TransactionStatistics.obterTop10(todas).forEach(t ->
+                                System.out.printf("ID: %s | Valor: R$ %,.2f | Conta: %s%n",
+                                        t.transactionId(), t.amount(), t.accountId()));
+
+                        CompletableFuture.allOf(tarefaGeraRelatorio, tarefaGeraArquivoFralde).join();
+
+                    }).join();
+
+            System.out.println("\nProcesso finalizado com sucesso!");
+
+        } catch (Exception e) {
+            System.err.println("Erro fatal no processamento: " + e.getCause().getMessage());
+        }
     }
 }

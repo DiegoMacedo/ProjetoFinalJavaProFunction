@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class TransctionStatistics {
+public class TransactionStatistics {
     public static BigDecimal calcularValorLiquido(List<Transaction> transacoes) {
         return transacoes.stream()
                 .map(t -> "Debit".equalsIgnoreCase(t.type()) ? t.amount().negate() : t.amount())
