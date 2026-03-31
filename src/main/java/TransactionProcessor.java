@@ -14,20 +14,20 @@ public class TransactionProcessor {
                         });
 
                         var tarefaGeraArquivoFralde = CompletableFuture.runAsync(() -> {
-                            var transacoesSuspeitas = FraudDetector.buscarSuspeitas(todas);
-                            ReportWriter.exportarSuspeitas(transacoesSuspeitas, "transacoes_suspeitas.csv");
+                            var transacoesSuspeitas = FraudDetector.buscarTransacoesSuspeitas(todas);
+                            ReportWriter.exportarTransacoesSuspeitas(transacoesSuspeitas, "transacoes_suspeitas.csv");
                         });
 
                         System.out.println("\n==================================================");
                         System.out.println("   RELATÓRIO DE TRANSAÇÕES BANCÁRIAS - SUMÁRIO");
                         System.out.println("==================================================");
                         System.out.printf("Total de transações processadas: %, d%n", todas.size());
-                        System.out.printf("Valor total movimentado: R$ %,.2f%n", TransactionStatistics.calcularValorLiquido(todas));
+                        System.out.printf("Valor total movimentado: R$%,.2f%n", TransactionStatistics.calcularValorLiquido(todas));
 
                         System.out.println("--------------------------------------------------");
                         System.out.println("TOP 10 MAIORES TRANSAÇÕES:");
                         TransactionStatistics.obterTop10(todas).forEach(t ->
-                                System.out.printf("ID: %s | Valor: R$ %,.2f | Conta: %s%n",
+                                System.out.printf("ID: %s | Valor: R$%,.2f | Conta: %s%n",
                                         t.transactionId(), t.amount(), t.accountId()));
 
                         CompletableFuture.allOf(tarefaGeraRelatorio, tarefaGeraArquivoFralde).join();

@@ -1,0 +1,16 @@
+=================================================
+       RELATÓRIO ESTATISTICO DE TRANSAÇÕES
+=================================================
+
+--- MÉDIA DE SALDO POR PROFISSÃO ---
+Engineer: R$ 5486,41
+Retired: R$ 4542,16
+Doctor: R$ 8978,99
+Student: R$ 1570,21
+
+--- VOLUME POR CANAL ---
+Branch: 868 transações
+ATM: 833 transações
+Online: 811 transações
+
+==============================================

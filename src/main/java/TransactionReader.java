@@ -26,7 +26,7 @@ public class TransactionReader {
                             new BigDecimal(coluna[14])
                     )).toList();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Erro ao tentar ler o arquivo CSV: " + e.getMessage());
         }
     }
