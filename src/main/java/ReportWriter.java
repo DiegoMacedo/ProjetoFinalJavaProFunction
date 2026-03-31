@@ -22,7 +22,7 @@ public class ReportWriter {
             escreverNoArquivo.println("       RELATÓRIO ESTATISTICO DE TRANSAÇÕES");
             escreverNoArquivo.println("=================================================");
 
-            escreverNoArquivo.println("\n--- MÉDIA DE SALDO POR PROFISSÕA ---");
+            escreverNoArquivo.println("\n--- MÉDIA DE SALDO POR PROFISSÃO ---");
             medias.forEach((prof, media) ->
                     escreverNoArquivo.printf("%s: R$ %.2f%n", prof, media));
 

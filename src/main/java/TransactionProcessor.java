@@ -11,7 +11,8 @@ public class TransactionProcessor {
         CompletableFuture<Void> processamentoCompleto = tarefaLeitura.thenCompose(todas -> {
 
             CompletableFuture<Void> estatisticass = CompletableFuture.runAsync(() -> {
-                var total = TransctionStatistics.calcularValorLiquido(todas);
+                var mediasDeSaldoPorPorfissao = TransctionStatistics.mediaSaldoPorProfissao(todas);
+                var volumesPorCanalDeAtendimento = TransctionStatistics.
                 System.out.println("Cálculo de Saldo Líquido Conclído: " + total);
             });
 

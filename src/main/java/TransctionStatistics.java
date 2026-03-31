@@ -23,4 +23,12 @@ public class TransctionStatistics {
                 .collect(Collectors.groupingBy(Transaction::occupation,
                         Collectors.averagingDouble(t -> t.balance().doubleValue())));
     }
+
+    public static Map<String, Long> volumePorCanal(List<Transaction> transacoes) {
+        return transacoes.stream()
+                .collect(Collectors.groupingBy(
+                        Transaction::channel,
+                        Collectors.counting()
+                ));
+    }
 }
